@@ -1,0 +1,206 @@
+Partial Class _Default
+    Inherits System.Web.UI.Page
+
+    Protected Sub Page_Init(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
+        Debug.WriteLine("Page init")
+        Me.MultiView1.ActiveViewIndex = 0
+        LoadControls()
+    End Sub
+
+    Protected Sub GridView1_RowCommand(ByVal sender As Object, ByVal e As System.Web.UI.WebControls.GridViewCommandEventArgs) Handles gvUsers.RowCommand
+        'We need to unlock the specified user
+        If e.CommandName = "UnlockUser" Then
+            Debug.WriteLine("Clicked Unlock User")
+        End If
+    End Sub
+
+
+    Protected Sub GridView1_RowDataBound(ByVal sender As Object, ByVal e As System.Web.UI.WebControls.GridViewRowEventArgs) Handles gvUsers.RowDataBound
+        If e.Row.RowType = DataControlRowType.DataRow Then
+            Dim roleList(3) As String
+            roleList(0) = "Administrator"
+            roleList(1) = "CSR"
+            roleList(2) = "Manager"
+
+            Dim roleCount As Integer = roleList.Length
+            Dim row As DataRow = (CType(e.Row.DataItem, DataRowView)).Row
+            Dim columnCount As Integer = e.Row.Cells.Count
+
+        End If
+
+
+
+        '****Putting checkbox columns to the right side of the table
+        If e.Row.RowType = DataControlRowType.DataRow Or e.Row.RowType = DataControlRowType.Header Then
+            Dim gvRow As GridViewRow = e.Row
+            Dim columns As List(Of TableCell) = New List(Of TableCell)()
+
+            'For Each column As DataControlField In gvUsers.Columns
+            For Each column In gvUsers.Columns
+                Dim cell As TableCell = gvRow.Cells(0)
+                gvRow.Cells.Remove(cell)
+                columns.Add(cell)
+            Next
+
+            gvRow.Cells.AddRange(columns.ToArray())
+        End If
+    End Sub
+
+
+    Protected Sub LoadUserInfo()
+        Dim tbl As New DataTable()
+        tbl.TableName = "userTable"
+        tbl.Columns.Add("Username", GetType(String))
+        tbl.Columns.Add("First Name", GetType(String))
+        tbl.Columns.Add("Last Name", GetType(String))
+        tbl.Columns.Add("Email", GetType(String))
+
+        Dim dr1 = tbl.NewRow()
+        dr1("Username") = "User1"
+        dr1("First Name") = "Aaron"
+        dr1("Last Name") = "Kim"
+        dr1("Email") = "aakim@ucdavis.edu"
+        tbl.Rows.Add(dr1)
+
+        Dim dr2 = tbl.NewRow()
+        dr2("Username") = "User2"
+        dr2("First Name") = "Aaron"
+        dr2("Last Name") = "Kim"
+        dr2("Email") = "aakim@ucdavis.edu"
+        tbl.Rows.Add(dr2)
+
+        Dim dr3 = tbl.NewRow()
+        dr3("Username") = "User3"
+        dr3("First Name") = "Aaron"
+        dr3("Last Name") = "Kim"
+        dr3("Email") = "aakim@ucdavis.edu"
+        tbl.Rows.Add(dr3)
+
+        gvUsers.DataSource = tbl
+        gvUsers.DataBind()
+    End Sub
+
+    Protected Sub LoadCheckBoxes()
+        While (gvUsers.Columns.Count > 4)
+            gvUsers.Columns.RemoveAt(gvUsers.Columns.Count - 1)
+        End While
+        gvUsers.DataBind()
+
+        Dim roleList(3) As String
+        roleList(0) = "Administrator"
+        roleList(1) = "CSR"
+        roleList(2) = "Manager"
+
+        ' CheckBox columns
+        For k As Integer = 0 To roleList.Length - 2
+            Dim tf = New TemplateField()
+            tf.HeaderText = roleList(k)
+            tf.ItemTemplate = New CreateItemTemplate(ListItemType.Item, roleList(k))
+            gvUsers.Columns.Add(tf)
+        Next
+
+        gvUsers.DataBind()
+    End Sub
+
+    Public Sub Username_Click(ByVal sender As Object, ByVal e As EventArgs)
+        Dim username As LinkButton = CType(sender, LinkButton)
+        Dim gvr As GridViewRow = CType(username.Parent.Parent, GridViewRow)
+
+        'Get the user information
+        Dim Name As String = CType(gvr.FindControl("UsernameBtn"), LinkButton).Text
+        Debug.WriteLine(Name)
+
+
+    End Sub
+
+    Public Sub LoadControls()
+        Debug.WriteLine("Load Controls")
+        LoadUserInfo()
+        LoadCheckBoxes()
+        'LoadAvailibleRoles()
+    End Sub
+
+    Protected Sub CheckboxHandler(ByVal sender As Object, ByVal e As EventArgs)
+        Debug.WriteLine("Ccccccccccccccccc")
+    End Sub
+
+
+End Class
+
+
+
+Public Class CreateItemTemplate
+    Implements ITemplate
+
+    Private myType As ListItemType
+    Private roleName As String
+
+    Public Sub InstantiateIn(container As Control) Implements ITemplate.InstantiateIn
+
+        ' Checkboxes in View Privileged Page
+        If myType = ListItemType.Item Then
+            Dim cb As CheckBox = New CheckBox()
+            cb.ID = "is" & roleName
+            cb.AutoPostBack = True
+            cb.Enabled = False
+
+            container.Controls.Add(cb)
+
+        End If
+
+    End Sub
+
+    Public Sub New(ByVal Item As ListItemType, ByVal s As String)
+        myType = Item
+        roleName = s
+        roleName = roleName.Replace(" ", String.Empty)
+
+    End Sub
+
+End Class
+
+
+
+
+
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+
+
+
+
+
+<%@ Page Language="vb" AutoEventWireup="false" CodeBehind="Default.aspx.vb" Inherits="WebApplication4._Default" %>   
+
+<form runat="server">
+  <html xmlns="http://www.w3.org/1999/xhtml">
+      <head runat="server">
+          <title></title>
+      </head>
+          <body>
+          <asp:MultiView ID="MultiView1" runat="server" ActiveViewIndex="0">
+              <asp:View ID="View1" runat="server">
+                  <asp:GridView ID="gvUsers" runat="server"  CellPadding="4" Width="750" EnableViewState="false" AutoGenerateColumns="false" GridLines="None" AllowPaging="True" PageSize="20" DataField="isActive">
+                      <FooterStyle BackColor="#990000" Font-Bold="True" ForeColor="White" />
+                      <RowStyle CssClass="odd" />
+                      <SelectedRowStyle CssClass="selected" />
+                      <PagerStyle ForeColor="#333333" HorizontalAlign="Center" />
+                      <HeaderStyle CssClass="tableheader" />
+                      <AlternatingRowStyle CssClass="even" /> 
+                      <Columns>
+                          <asp:TemplateField HeaderText="Username">
+                              <ItemTemplate>
+                                  <asp:LinkButton ID="UsernameBtn" runat="server" OnClick="Username_Click" Text='<%#Eval("Username")%>'></asp:LinkButton>
+                              </ItemTemplate>
+                          </asp:TemplateField>
+                          <asp:BoundField DataField="First Name" HeaderText="First Name" />
+                          <asp:BoundField DataField="Last Name" HeaderText="Last Name" />
+                          <asp:BoundField DataField="Email" HeaderText="Email" />
+                      </Columns>
+                  </asp:GridView>
+              </asp:View>
+          </asp:MultiView>
+      </body>
+  </html>
+</form>
