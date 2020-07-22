@@ -1,11 +1,13 @@
 Partial Class _Default
     Inherits System.Web.UI.Page
 
+    '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
     Protected Sub Page_Init(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Debug.WriteLine("Page init")
         Me.MultiView1.ActiveViewIndex = 0
         LoadControls()
     End Sub
+    '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
 
     Protected Sub GridView1_RowCommand(ByVal sender As Object, ByVal e As System.Web.UI.WebControls.GridViewCommandEventArgs) Handles gvUsers.RowCommand
         'We need to unlock the specified user
@@ -81,10 +83,12 @@ Partial Class _Default
     End Sub
 
     Protected Sub LoadCheckBoxes()
+        '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
         While (gvUsers.Columns.Count > 4)
             gvUsers.Columns.RemoveAt(gvUsers.Columns.Count - 1)
         End While
         gvUsers.DataBind()
+        '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
 
         Dim roleList(3) As String
         roleList(0) = "Administrator"
@@ -102,6 +106,7 @@ Partial Class _Default
         gvUsers.DataBind()
     End Sub
 
+    '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
     Public Sub Username_Click(ByVal sender As Object, ByVal e As EventArgs)
         Dim username As LinkButton = CType(sender, LinkButton)
         Dim gvr As GridViewRow = CType(username.Parent.Parent, GridViewRow)
@@ -112,6 +117,7 @@ Partial Class _Default
 
 
     End Sub
+    '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
 
     Public Sub LoadControls()
         Debug.WriteLine("Load Controls")
@@ -160,47 +166,3 @@ Public Class CreateItemTemplate
 End Class
 
 
-
-
-
-
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
-
-
-
-
-
-<%@ Page Language="vb" AutoEventWireup="false" CodeBehind="Default.aspx.vb" Inherits="WebApplication4._Default" %>   
-
-<form runat="server">
-  <html xmlns="http://www.w3.org/1999/xhtml">
-      <head runat="server">
-          <title></title>
-      </head>
-          <body>
-          <asp:MultiView ID="MultiView1" runat="server" ActiveViewIndex="0">
-              <asp:View ID="View1" runat="server">
-                  <asp:GridView ID="gvUsers" runat="server"  CellPadding="4" Width="750" EnableViewState="false" AutoGenerateColumns="false" GridLines="None" AllowPaging="True" PageSize="20" DataField="isActive">
-                      <FooterStyle BackColor="#990000" Font-Bold="True" ForeColor="White" />
-                      <RowStyle CssClass="odd" />
-                      <SelectedRowStyle CssClass="selected" />
-                      <PagerStyle ForeColor="#333333" HorizontalAlign="Center" />
-                      <HeaderStyle CssClass="tableheader" />
-                      <AlternatingRowStyle CssClass="even" /> 
-                      <Columns>
-                          <asp:TemplateField HeaderText="Username">
-                              <ItemTemplate>
-                                  <asp:LinkButton ID="UsernameBtn" runat="server" OnClick="Username_Click" Text='<%#Eval("Username")%>'></asp:LinkButton>
-                              </ItemTemplate>
-                          </asp:TemplateField>
-                          <asp:BoundField DataField="First Name" HeaderText="First Name" />
-                          <asp:BoundField DataField="Last Name" HeaderText="Last Name" />
-                          <asp:BoundField DataField="Email" HeaderText="Email" />
-                      </Columns>
-                  </asp:GridView>
-              </asp:View>
-          </asp:MultiView>
-      </body>
-  </html>
-</form>
